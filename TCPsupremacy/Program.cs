@@ -33,7 +33,7 @@ namespace TCPsupremacy
                 //get the string from the stream
                 pubKeyString = sw.ToString();
             }
-            Console.WriteLine("Enter IP of server, or enter 0 for Mads or 1 for loopback, or 2 for din lokale luder");
+            Console.WriteLine("Enter IP of server, or enter 0 for Mads or 1 for loopback, or 2 til Mads på skolen");
             string serverIP = Console.ReadLine();
             if (serverIP == "0")
             {
@@ -68,8 +68,6 @@ namespace TCPsupremacy
             Thread killer = new Thread(new ThreadStart(ThreadKiller));
             killer.Start();
 
-            Console.WriteLine("Connected - Waiting for friends...");
-
             while (true)
             {
                 if (!cont)
@@ -79,7 +77,6 @@ namespace TCPsupremacy
                 }
                 try
                 {
-                    Console.WriteLine("Fed");
                     TcpClient tcp = new TcpClient();
                     tcp.Connect(serverIP, 5050);
                     Send(tcp, hash);
@@ -92,7 +89,7 @@ namespace TCPsupremacy
                             break;
                         }
                     }
-                    Console.WriteLine("Friend found, establish connection");
+                    Console.WriteLine("Establishing Connection");
                     tcp.Close();
                     TcpClient tcp2 = new TcpClient();
                     tcp2.Connect(serverIP, 5050 + 1);
@@ -101,27 +98,20 @@ namespace TCPsupremacy
                     string peerIP = mesa.Split(',')[0];
                     int port = Convert.ToInt32(mesa.Split(',')[1]);
                     Client client = new Client();
-                    Console.WriteLine("Attempting Holepunch {0} {1}", peerIP, port);
+                    Console.WriteLine("Attempting Connection to {0} {1}", peerIP, port);
                     client.client.ConnectAsync(peerIP, port + 1).Wait(2000);
-                    Console.WriteLine("Penis");
                     client.csp = new RSACryptoServiceProvider();
                     Send(client.client, pubKeyString);
-                    Console.WriteLine("lille håb");
-                    RSAParameters newKey;
                     string newKeyString = Read(client.client);
                     Console.WriteLine(newKeyString);
                     {
                         //get a stream from the string
                         var sr = new StringReader(newKeyString);
-                        Console.WriteLine("hhm");
                         //we need a deserializer
                         var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
                         //get the object back from the stream
-                        newKey = (RSAParameters)xs.Deserialize(sr);
+                        client.csp.ImportParameters((RSAParameters)xs.Deserialize(sr));
                     }
-                    Console.WriteLine("yeet");
-                    client.csp.ImportParameters(newKey);
-                    Console.WriteLine("Større penis");
 
                     eSend(client, user);
                     client.name = eRead(client);
@@ -136,7 +126,7 @@ namespace TCPsupremacy
                 }
                 catch 
                 {
-                    Console.WriteLine("Holepunch virker ikke");
+                    Console.WriteLine("Connection failed - retrying");
                 }
             }
         }
@@ -204,7 +194,7 @@ namespace TCPsupremacy
         {
             //Initialiser stream
             var memoryStream = new MemoryStream();
-            var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8); //Skift encoding hvis det behøves
+            var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
             //Skriv string til streamen
             streamWriter.Write(input);
             streamWriter.Flush();
