@@ -14,13 +14,10 @@ namespace TCPsupremacy
        
     class Program
     {
-        //private static List<TcpClient> clients = new List<TcpClient>();
-
-        /*private static Dictionary<TcpClient, Thread> connections = new Dictionary<TcpClient, Thread>();
-        private static Dictionary<TcpClient, string> names = new Dictionary<TcpClient, string>();*/
         private static RSACryptoServiceProvider rsa;
         private static RSAParameters pubKey;
         private static List<Client> clients = new List<Client>();
+        private static bool cont = true;
         static void Main(string[] args)
         {
             rsa = new RSACryptoServiceProvider(2048);
@@ -62,13 +59,9 @@ namespace TCPsupremacy
                 user = "anon";
             }
 
-            //Skab forbindelse til serveren, skriv rum og pass til serveren.
-            TcpClient roomConnector = new TcpClient();
-            roomConnector.Connect(serverIP, 5050);
+            
             string hash = MakeHash(rum+pass);
-            Send(roomConnector, hash);
-            //Send(roomConnector, rum + pass);
-            roomConnector.Close();
+            
 
             Thread sender = new Thread(new ThreadStart(Sender));
             sender.Start();
@@ -79,12 +72,16 @@ namespace TCPsupremacy
 
             while (true)
             {
+                if (!cont)
+                {
+                    break;
+                }
                 try
                 {
                     Console.WriteLine("Fed");
                     TcpClient tcp = new TcpClient();
                     tcp.Connect(serverIP, 5050);
-                    Send(tcp, "!RECONNECT" + hash);
+                    Send(tcp, hash);
                     //Send(tcp, rum + pass);
 
                     while (true)
@@ -98,12 +95,13 @@ namespace TCPsupremacy
                     tcp.Close();
                     TcpClient tcp2 = new TcpClient();
                     tcp2.Connect(serverIP, 5050 + 1);
-                    string peerIP = Read(tcp2);
-                    int port = Convert.ToInt32(Read(tcp2));
+                    string mesa = Read(tcp2);
+                    Console.WriteLine(mesa);
+                    string peerIP = mesa.Split(',')[0];
+                    int port = Convert.ToInt32(mesa.Split(',')[1]);
                     Client client = new Client();
                     Console.WriteLine("Attempting Holepunch {0} {1}", peerIP, port);
                     client.client.ConnectAsync(peerIP, port + 1).Wait(2000);
-                    //client.client.Connect(peerIP, port + 1);
                     Console.WriteLine("Penis");
                     client.csp = new RSACryptoServiceProvider();
                     Send(client.client, pubKeyString);
@@ -132,6 +130,7 @@ namespace TCPsupremacy
                     client.receiver = receiver;
                     clients.Add(client);
                     Console.WriteLine("Connected to {0}:{1} with name {2}", peerIP, port + 1, client.name);
+                    cont = false;
                     //Console.WriteLine("Connected to {0}", client.name);
                 }
                 catch 
@@ -172,6 +171,11 @@ namespace TCPsupremacy
             while (true)
             {
                 string msg = Console.ReadLine();
+                if (msg == "!ADD")
+                {
+                    cont = true;
+                    break;
+                }
                 foreach (var client in clients)
                 {
                     eSend(client, msg);
