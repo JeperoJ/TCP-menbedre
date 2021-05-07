@@ -81,6 +81,7 @@ namespace TCPsupremacy
             {
                 try
                 {
+                    Console.WriteLine("Fed");
                     TcpClient tcp = new TcpClient();
                     tcp.Connect(serverIP, 5050);
                     Send(tcp, "!RECONNECT" + hash);
@@ -123,12 +124,6 @@ namespace TCPsupremacy
                     client.csp.ImportParameters(newKey);
                     Console.WriteLine("Større penis");
 
-                    TcpClient tcp3 = new TcpClient();
-                    tcp3.Connect(serverIP, 5050);
-                    Send(tcp3, "!COMPLETED");
-                    tcp2.Close();
-                    tcp3.Close();
-
                     eSend(client, user);
                     client.name = eRead(client);
                     Thread receiver = new Thread(() => Receive(client));
@@ -142,10 +137,6 @@ namespace TCPsupremacy
                 catch 
                 {
                     Console.WriteLine("Holepunch virker ikke");
-                    TcpClient tcp = new TcpClient();
-                    tcp.Connect(serverIP, 5050);
-                    Send(tcp, "!FAILED");
-                    
                 }
             }
         }
