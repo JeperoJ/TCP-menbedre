@@ -74,7 +74,8 @@ namespace TCPsupremacy
             {
                 if (!cont)
                 {
-                    break;
+                    Thread.Sleep(10);
+                    continue;
                 }
                 try
                 {
@@ -174,7 +175,7 @@ namespace TCPsupremacy
                 if (msg == "!ADD")
                 {
                     cont = true;
-                    break;
+                    continue;
                 }
                 foreach (var client in clients)
                 {
