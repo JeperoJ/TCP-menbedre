@@ -201,25 +201,7 @@ namespace TCPsupremacy
                 }
                 else if (msg.Contains("!DISCONNECT"))
                 {
-                    if (msg.Length == 11)
-                    {
-                        //Exiter programmet
-                        Environment.Exit(0);
-                    }
-                    else
-                    {
-                        string match = msg.Remove(0, 12);
-                        //Fjerner en specifik ønsket client
-                        foreach (var client in clients)
-                        {
-                            if (client.name == match)
-                            {
-                                client.client.Close();
-                                Console.WriteLine("{0} with IP {1} has been disconnected", client.name, client.client.Client.RemoteEndPoint.ToString());
-
-                            }
-                        }
-                    }
+                    Environment.Exit(0);
                 }
                 else {
                     //Sender til alle clients
