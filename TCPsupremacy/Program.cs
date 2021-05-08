@@ -253,24 +253,35 @@ namespace TCPsupremacy
             while (true)
             {
                 //Er i try, da hvis der er noget som skriver til listen samtidigt, thrower det en exception. Vi er lidt ligeglade, og kører det bare igen en anden gang
-                try
+
+                /*foreach (var client in clients)
                 {
-                    foreach (var client in clients)
+                    //Tjekker om receiver threaden er i live
+                    if (!client.receiver.IsAlive)
                     {
-                        //Tjekker om receiver threaden er i live
-                        if (!client.receiver.IsAlive)
-                        {
-                            //Lukker threaden ordentlig
-                            client.receiver.Join();
-                            Console.WriteLine("{0} with IP {1} has disconnected", client.name, client.client.Client.RemoteEndPoint.ToString());
-                            //Lukker clienten ordentlig
-                            client.client.Close();
-                            //Fjerne den fra listen
-                            clients.Remove(client);
-                        }
+                        //Lukker threaden ordentlig
+                        client.receiver.Join();
+                        Console.WriteLine("{0} with IP {1} has disconnected", client.name, client.client.Client.RemoteEndPoint.ToString());
+                        //Lukker clienten ordentlig
+                        client.client.Close();
+                        //Fjerne den fra listen
+                        clients.Remove(client);
+                    }
+                }*/
+                for (int i = 0; i < clients.Count; i++)
+                {
+                    // Tjekker om receiver threaden er i live
+                    if (!clients[i].receiver.IsAlive)
+                    {
+                        //Lukker threaden ordentlig
+                        clients[i].receiver.Join();
+                        Console.WriteLine("{0} with IP {1} has disconnected", clients[i].name, clients[i].client.Client.RemoteEndPoint.ToString());
+                        //Lukker clienten ordentlig
+                        clients[i].client.Close();
+                        //Fjerne den fra listen
+                        clients.Remove(clients[i]);
                     }
                 }
-                catch { }
                 Thread.Sleep(5);
             }
         }
