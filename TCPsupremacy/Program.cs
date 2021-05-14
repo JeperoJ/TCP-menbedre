@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading;
 using System.Security.Cryptography;
 using System.IO;
+using System.Diagnostics;
 
 namespace TCPsupremacy
 {
@@ -68,6 +69,8 @@ namespace TCPsupremacy
             Thread killer = new Thread(new ThreadStart(ThreadKiller));
             killer.Start();
 
+            Stopwatch stopwatch = new Stopwatch();
+
             while (true)
             {
                 //If statement, der checker om der ønskes at starte en ny forbindelse. Ellers springer den koden over
@@ -92,6 +95,9 @@ namespace TCPsupremacy
                             break;
                         }
                     }
+
+                    stopwatch.Start();
+                    
                     //Starter forbindelse til at facilitate holepunching
                     Console.WriteLine("Establishing Connection");
                     tcp.Close();
@@ -136,6 +142,8 @@ namespace TCPsupremacy
                     //sørger for den ikke looper
                     cont = false;
                     //Console.WriteLine("Connected to {0}", client.name);
+                    stopwatch.Stop();
+                    Console.WriteLine("Connection took {0} milleseconds", stopwatch.Elapsed);
                 }
                 catch 
                 {
